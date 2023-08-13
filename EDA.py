@@ -12,6 +12,7 @@ import numpy as np
 import os 
 import pandas as pd 
 import seaborn as sns
+from sklearn.decomposition import PCA
 
 # Distribution graphs (histogram/bar graph) of column data
 def plotPerColumnDistribution(df, nGraphShown, nGraphPerRow):
@@ -39,12 +40,11 @@ def plotPerColumnDistribution(df, nGraphShown, nGraphPerRow):
 def plotCorrelationMatrix(df, graphWidth):
     filename = df.dataframeName
     df = df.dropna('columns') # drop columns with NaN
-    df = df[[col for col in df if df[col].nunique() > 1]] # keep columns where there are more than 1 unique values
+    
+    df = df[[col for col in df if df[col].nunique() > 0]] # keep columns where there are more than 1 unique values
     if df.shape[1] < 2:
         print(f'No correlation plots shown: The number of non-NaN or constant columns ({df.shape[1]}) is less than 2')
         return
-    
-    corr = df.corr()
     
     # plt.figure(num=None, figsize=(graphWidth, graphWidth), dpi=80, facecolor='w', edgecolor='k')
     # corrMat = plt.matshow(corr, fignum = 1)
@@ -80,21 +80,62 @@ def plotScatterMatrix(df, plotSize, textSize):
 nRowsRead = None # specify 'None' if want to read whole file
 
 def accessories():
-    # category-accessories.csv may have more rows in reality, but we are only loading/previewing the first 1000 rows
+    # accessories.csv may have more rows in reality, but we are only loading/previewing the first 1000 rows
     df1 = pd.read_csv('accessories.csv', delimiter=',', nrows = nRowsRead)
     df1.dataframeName = 'accessories.csv'
     nRow, nCol = df1.shape
     print(f'There are {nRow} rows and {nCol} columns')
     
+    print(type(df1['is_new'][0]))
+    
+    # Coverting is_new column values to discrete
+    for i in range(len(df1['is_new'])):
+        df1["is_new"][i] = int(df1["is_new"][i])
+    
+    
+    print()
+    print('<------------------------------->')
+    print('DATASET INFO')
+    print()
     print(df1.info())
     print()
     print('<------------------------------->')
+    print('DATASET UNIQUE VALUES')
     print()
     print(df1.nunique())
     print()
     print('<------------------------------->')
+    print('MISSING VALUE PERCENTAGE')
     print()
     print((df1.isnull().sum()/(len(df1)))*100)
+    print()
+    print('<------------------------------->')
+    print('DATA FRAME DESCRIBE')
+    print()
+    print(df1.describe())
+    print('<------------------------------->')
+    print('PCA')
+    print()
+    X = df1[['current_price' , 'raw_price' ,'discount' , 'likes_count' , 'is_new' , 'id']]
+    x_scaled = StandardScaler().fit_transform(X)
+    
+    pca = PCA()
+    pca_features = pca.fit_transform(x_scaled)
+    pca_df = pd.DataFrame(data=pca_features )
+    pca.fit_transform(x_scaled)
+    
+    
+    plt.bar(range(1,len(pca.explained_variance_)+1),pca.explained_variance_)
+    plt.xlabel('PCA Feature')
+    plt.ylabel('Explained variance')
+    plt.title('Feature Explained Variance')
+    plt.show()
+    print()
+    print('PCA Explained Variance : ',pca.explained_variance_ )
+
+
+    
+    # print(df1.describe(include = 'all'))
     
     plotPerColumnDistribution(df1, 10, 5)
     
