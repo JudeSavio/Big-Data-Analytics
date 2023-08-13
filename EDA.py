@@ -46,6 +46,9 @@ def plotCorrelationMatrix(df, graphWidth):
         print(f'No correlation plots shown: The number of non-NaN or constant columns ({df.shape[1]}) is less than 2')
         return
     
+    
+    corr = df.corr()
+    
     # plt.figure(num=None, figsize=(graphWidth, graphWidth), dpi=80, facecolor='w', edgecolor='k')
     # corrMat = plt.matshow(corr, fignum = 1)
     # plt.xticks(range(len(corr.columns)), corr.columns, rotation=90)
