@@ -82,7 +82,7 @@ def plotScatterMatrix(df, plotSize, textSize):
 
 nRowsRead = None # specify 'None' if want to read whole file
 
-def accessories():
+def accessoriesEDA():
     # accessories.csv may have more rows in reality, but we are only loading/previewing the first 1000 rows
     df1 = pd.read_csv('accessories.csv', delimiter=',', nrows = nRowsRead)
     df1.dataframeName = 'accessories.csv'
@@ -127,7 +127,6 @@ def accessories():
     pca_df = pd.DataFrame(data=pca_features )
     pca.fit_transform(x_scaled)
     
-    
     plt.bar(range(1,len(pca.explained_variance_)+1),pca.explained_variance_)
     plt.xlabel('PCA Feature')
     plt.ylabel('Explained variance')
@@ -135,7 +134,9 @@ def accessories():
     plt.show()
     print()
     print('PCA Explained Variance : ',pca.explained_variance_ )
-
+    cum_explained_variance = np.cumsum(pca.explained_variance_ratio_)
+    print('Cumulative explained variance:\n', cum_explained_variance)
+    print(sum(list(pca.explained_variance_))/len(list(pca.explained_variance_)))
 
     
     # print(df1.describe(include = 'all'))
@@ -146,21 +147,63 @@ def accessories():
     
     plotScatterMatrix(df1, 15, 10)
     
-def jewelry():
+def jewelryEDA():
     df2 = pd.read_csv('jewelry.csv', delimiter=',', nrows = nRowsRead)
     df2.dataframeName = 'jewelry.csv'
     nRow, nCol = df2.shape
     print(f'There are {nRow} rows and {nCol} columns')
     
-    print(df1.info())
+    print(df2.info())
+    
+    print()
+    print('<------------------------------->')
+    print('DATASET INFO')
+    print()
+    print(df2.info())
+    print()
+    print('<------------------------------->')
+    print('DATASET UNIQUE VALUES')
+    print()
+    print(df2.nunique())
+    print()
+    print('<------------------------------->')
+    print('MISSING VALUE PERCENTAGE')
+    print()
+    print((df2.isnull().sum()/(len(df1)))*100)
+    print()
+    print('<------------------------------->')
+    print('DATA FRAME DESCRIBE')
+    print()
+    print(df2.describe())
+    print('<------------------------------->')
+    print('PCA')
+    print()
+    X = df2[['current_price' , 'raw_price' ,'discount' , 'likes_count' , 'is_new' , 'id']]
+    x_scaled = StandardScaler().fit_transform(X)
+    
+    pca = PCA()
+    pca_features = pca.fit_transform(x_scaled)
+    pca_df = pd.DataFrame(data=pca_features )
+    pca.fit_transform(x_scaled)
+    
+    
+    plt.bar(range(1,len(pca.explained_variance_)+1),pca.explained_variance_)
+    plt.xlabel('PCA Feature')
+    plt.ylabel('Explained variance')
+    plt.title('Feature Explained Variance')
+    plt.show()
+    print()
+    print('PCA Explained Variance : ',pca.explained_variance_ )
+
     
     plotPerColumnDistribution(df2, 10, 5)
     
     plotCorrelationMatrix(df2, 10)
     
     plotScatterMatrix(df2, 15, 10)
-
-accessories()
+    
+# Calling the accessories data set EDA function
+accessoriesEDA()
 
 
 
